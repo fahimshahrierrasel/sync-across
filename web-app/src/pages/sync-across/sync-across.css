@@ -1,0 +1,15 @@
+.sync-across {
+    position: absolute;
+}
+
+.sync-across .sync-items{
+    margin-top: 60px;
+    overflow-y: hidden;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.sync-across .fileInput{
+    display: none;
+}

@@ -1,0 +1,19 @@
+<resources>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="submit">Submit</string>
+    <string name="new_item">New Item</string>
+    <string name="app_name">Sync Across</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="new_file">New File</string>
+    <string name="new_message">New Message</string>
+    <string name="image">Message Image</string>
+    <string name="file">Message File</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="message">Message</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="log_in">Log In</string>
+</resources>
