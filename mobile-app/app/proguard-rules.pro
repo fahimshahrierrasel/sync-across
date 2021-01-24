@@ -26,3 +26,4 @@
   **[] $VALUES;
   public *;
 }
+-keep public class com.fahimshahrierrasel.syncacross.models.*

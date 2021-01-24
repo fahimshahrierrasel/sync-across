@@ -18,7 +18,8 @@ local.properties
 /.idea/**/*
 *.log
 .firebaserc
-
-
+*.jks
+*.apk
+output-metadata.json
 
 
