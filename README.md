@@ -1,4 +1,5 @@
 # Sync Across
+![Logo](./loop.svg | width=100)
 
 Sync :recycle: small note, clip or file between mobile and web.
 
