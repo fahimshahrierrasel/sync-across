@@ -3,7 +3,6 @@ import firebase from "firebase";
 import Login from "../pages/login";
 import SyncAcross from "../pages/sync-across";
 import firebaseApp from "../data/firebase";
-import Bowser from "bowser";
 
 import "./App.css";
 
