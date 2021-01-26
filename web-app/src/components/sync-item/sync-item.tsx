@@ -34,16 +34,21 @@ const SyncItem = ({ syncItem, deleteItem }: ISyncItemProps) => {
     }
   };
 
+  const getFormattedDate = (date: Date): string => {
+    return new Intl.DateTimeFormat("en-US", {
+      dateStyle: "medium",
+      timeStyle: "medium",
+    } as Intl.DateTimeFormatOptions).format(date);
+  };
+
   return (
     <div className="sync-item">
       {getMessageDetails(syncItem)}
       <hr />
       <div className="sync-item__footer">
         <div className="sync-item__meta">
-          <span>
-            {syncItem.origin}
-          </span>
-          <span>{syncItem.createdAt.toDate()}</span>
+          <span>{syncItem.origin}</span>
+          <span>{getFormattedDate(syncItem.createdAt.toDate())}</span>
         </div>
         <div className="action-button">
           <img
