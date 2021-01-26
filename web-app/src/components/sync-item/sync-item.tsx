@@ -41,9 +41,9 @@ const SyncItem = ({ syncItem, deleteItem }: ISyncItemProps) => {
       <div className="sync-item__footer">
         <div className="sync-item__meta">
           <span>
-            {syncItem.origin} - {syncItem.type}
+            {syncItem.origin}
           </span>
-          <span>{syncItem.createdAt.toDate().toUTCString()}</span>
+          <span>{syncItem.createdAt.toDate()}</span>
         </div>
         <div className="action-button">
           <img

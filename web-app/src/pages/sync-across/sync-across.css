@@ -1,5 +1,6 @@
 .sync-across {
     position: absolute;
+    width: 100%;
 }
 
 .sync-across .sync-items{
