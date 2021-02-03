@@ -1,7 +1,6 @@
 package com.fahimshahrierrasel.syncacross.views
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -31,6 +30,7 @@ import com.fahimshahrierrasel.syncacross.models.ItemType
 import com.fahimshahrierrasel.syncacross.models.SyncItem
 import com.fahimshahrierrasel.syncacross.models.imageExtensions
 import com.fahimshahrierrasel.syncacross.utils.readBoolFromSharedPreference
+import com.fahimshahrierrasel.syncacross.utils.toEditable
 import com.fahimshahrierrasel.syncacross.utils.writeBoolToSharedPreference
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
 import com.google.android.material.snackbar.Snackbar
@@ -42,7 +42,6 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     lateinit var adapter: SyncItemRVAdapter
-    private val TAG = MainActivity::class.simpleName!!
     val networkScope = CoroutineScope(Dispatchers.IO + Job())
     private lateinit var binding: ActivityMainBinding
     private val requiredPermissions = arrayOf(
@@ -51,6 +50,7 @@ class MainActivity : AppCompatActivity() {
     )
 
     companion object {
+        private val TAG = MainActivity::class.simpleName!!
         const val PERMISSION_CODE = 111
         lateinit var Instance: MainActivity
     }
@@ -74,6 +74,13 @@ class MainActivity : AppCompatActivity() {
         // No need to panic about permission
         // I know how to give permission explicitly
         checkAndAskForPermission()
+
+        if(intent?.action == Intent.ACTION_SEND) {
+            intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
+                Log.i("MyIntent", it)
+                openNewMessageDialog(it)
+            }
+        }
 
         binding.newItemFab.setOnClickListener {
             mainItemOnClickListener(binding)
@@ -200,10 +207,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun textFabOnClickListener(binding: ActivityMainBinding) {
         mainItemOnClickListener(binding)
+        openNewMessageDialog()
+    }
+
+    private fun openNewMessageDialog(message: String = "") {
+        val newMessageView = layoutInflater.inflate(R.layout.new_message_input, binding.root, false)
+        val messageTextField = newMessageView.findViewById<TextInputLayout>(R.id.tf_message)
+        messageTextField.editText?.text = message.toEditable()
 
         MaterialDialog(this).show {
             title(R.string.new_message)
-            customView(R.layout.new_message_input)
+            customView(view = newMessageView)
             positiveButton(R.string.submit, click = {
                 val customView = this.getCustomView()
                 val tf = customView.findViewById<TextInputLayout>(R.id.tf_message)
