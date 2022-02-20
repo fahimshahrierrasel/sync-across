@@ -1,5 +1,9 @@
 export enum ItemType {
-  MESSAGE = "MESSAGE",
-  IMAGE = "IMAGE",
-  FILE = "FILE",
+  BOOKMARK = "bookmark",
+  MULTIMEDIA = "multimedia",
+  Note = "note",
+}
+
+export function itemTypes(): string[] {
+  return Object.values(ItemType);
 }
