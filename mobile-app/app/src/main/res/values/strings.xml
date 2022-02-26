@@ -1,19 +1,16 @@
 <resources>
-    <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
-    <string name="submit">Submit</string>
-    <string name="new_item">New Item</string>
     <string name="app_name">Sync Across</string>
-    <string name="appwidget_text">EXAMPLE</string>
-    <string name="add_widget">Add widget</string>
-    <string name="new_file">New File</string>
-    <string name="new_message">New Message</string>
-    <string name="image">Message Image</string>
-    <string name="file">Message File</string>
-    <string name="light">Light</string>
-    <string name="dark">Dark</string>
-    <string name="message">Message</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
-    <string name="log_in">Log In</string>
+    <string name="log_in">Login</string>
+    <string name="logo">Application Logo</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="content_type">Type</string>
+    <string name="lorem">Amet diam et dignissim ipsum consequat in facilisi justo. Doming magna ea justo ipsum amet nonumy accusam kasd no.</string>
+    <string name="menu">Menu</string>
+    <string name="search">Search</string>
+    <string name="search_placeholder">Search...</string>
+    <string name="tags">Tags</string>
+    <string name="logout">Logout</string>
 </resources>

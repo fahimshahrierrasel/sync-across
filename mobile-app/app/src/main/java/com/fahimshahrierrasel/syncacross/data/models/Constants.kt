@@ -1,4 +1,4 @@
-package com.fahimshahrierrasel.syncacross.models
+package com.fahimshahrierrasel.syncacross.data.models
 
 class Constants {
     companion object {

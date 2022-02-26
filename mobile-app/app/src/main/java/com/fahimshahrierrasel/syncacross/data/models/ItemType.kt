@@ -1,4 +1,4 @@
-package com.fahimshahrierrasel.syncacross.models
+package com.fahimshahrierrasel.syncacross.data.models
 
 enum class ItemType(val value: Int) {
     MESSAGE(0),

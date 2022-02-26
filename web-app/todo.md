@@ -1,0 +1,5 @@
+- [] Search Capabilities
+- [] Functional Sidebar 
+- [] Pagination
+- [] Sorting
+- [] Favourites

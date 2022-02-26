@@ -1,16 +1,18 @@
-package com.fahimshahrierrasel.syncacross.models
+package com.fahimshahrierrasel.syncacross.data.models
 
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.reflect.full.memberProperties
 
 data class SyncItem(
+    var title: String,
     var type: ItemType,
     var value: String,
     var origin: String,
+    var tags: List<String>,
     var createdAt: Date
 ) {
-    constructor() : this(ItemType.MESSAGE, "", "", Date())
+    constructor() : this("Untitled", ItemType.MESSAGE, "", "", emptyList(), Date())
 
     fun toFirebaseObject(): HashMap<String, Any> {
         val firebaseObject = HashMap<String, Any>()

@@ -1,45 +1,49 @@
-package com.fahimshahrierrasel.syncacross.views
+package com.fahimshahrierrasel.syncacross
 
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.CountDownTimer
-import android.os.Environment
-import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.paging.PagedList
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.customview.getCustomView
-import com.afollestad.materialdialogs.files.fileChooser
-import com.fahimshahrierrasel.syncacross.R
-import com.fahimshahrierrasel.syncacross.config.FirebaseConfig
-import com.fahimshahrierrasel.syncacross.databinding.ActivityMainBinding
-import com.fahimshahrierrasel.syncacross.models.Constants
-import com.fahimshahrierrasel.syncacross.models.ItemType
-import com.fahimshahrierrasel.syncacross.models.SyncItem
-import com.fahimshahrierrasel.syncacross.models.imageExtensions
-import com.fahimshahrierrasel.syncacross.utils.readBoolFromSharedPreference
-import com.fahimshahrierrasel.syncacross.utils.toEditable
-import com.fahimshahrierrasel.syncacross.utils.writeBoolToSharedPreference
-import com.firebase.ui.firestore.paging.FirestorePagingOptions
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.switchmaterial.SwitchMaterial
-import com.google.android.material.textfield.TextInputLayout
-import com.google.firebase.firestore.Query
-import kotlinx.coroutines.*
-import java.util.*
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.runtime.SideEffect
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.fahimshahrierrasel.syncacross.ui.NavigationScreens
+import com.fahimshahrierrasel.syncacross.ui.screens.Home
+import com.fahimshahrierrasel.syncacross.ui.screens.Login
+import com.fahimshahrierrasel.syncacross.ui.theme.PrimaryColor
+import com.fahimshahrierrasel.syncacross.ui.theme.SyncAcrossTheme
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            val systemUiController = rememberSystemUiController()
+            val navController = rememberNavController();
+
+            SideEffect {
+                systemUiController.setSystemBarsColor(
+                    color = PrimaryColor,
+                    darkIcons = false,
+                )
+            }
+
+            SyncAcrossTheme {
+                NavHost(navController = navController, startDestination = NavigationScreens.Login.route) {
+                    composable(NavigationScreens.Login.route) {
+                        Login(navController)
+                    }
+                    composable(NavigationScreens.Home.route) {
+                        Home(navController)
+                    }
+                }
+            }
+        }
+    }
+}
+
+/*
 class MainActivity : AppCompatActivity() {
     lateinit var adapter: SyncItemRVAdapter
     val networkScope = CoroutineScope(Dispatchers.IO + Job())
@@ -223,9 +227,11 @@ class MainActivity : AppCompatActivity() {
                 val tf = customView.findViewById<TextInputLayout>(R.id.tf_message)
 
                 val item = SyncItem(
+                    "Untitled",
                     ItemType.MESSAGE,
                     tf.editText?.text.toString(),
                     Build.MODEL,
+                    emptyList<String>(),
                     Calendar.getInstance(TimeZone.getTimeZone("UTC")).time
                 )
                 networkScope.launch {
@@ -286,9 +292,11 @@ class MainActivity : AppCompatActivity() {
 
                             val downloadUri = task.result
                             val item = SyncItem(
+                                "Untitled",
                                 type,
                                 downloadUri.toString(),
                                 Build.MODEL,
+                                emptyList<String>(),
                                 currentDateTime.time
                             )
                             networkScope.launch {
@@ -336,3 +344,4 @@ class MainActivity : AppCompatActivity() {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
     }
 }
+ */

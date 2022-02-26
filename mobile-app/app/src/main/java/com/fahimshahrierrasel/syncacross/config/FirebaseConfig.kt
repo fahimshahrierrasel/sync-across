@@ -1,15 +1,13 @@
 package com.fahimshahrierrasel.syncacross.config
 
 import android.util.Log
-import com.fahimshahrierrasel.syncacross.BuildConfig
-import com.fahimshahrierrasel.syncacross.models.FireStoreCollection
-import com.fahimshahrierrasel.syncacross.models.SyncItem
+import com.fahimshahrierrasel.syncacross.data.models.FireStoreCollection
+import com.fahimshahrierrasel.syncacross.data.models.SyncItem
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.firestoreSettings
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
@@ -24,15 +22,15 @@ object FirebaseConfig {
     val auth = FirebaseAuth.getInstance()
 
     init {
-        if (BuildConfig.DEBUG) {
-            Log.i(TAG, "Setting Emulator Config")
-            db.firestoreSettings = firestoreSettings {
-                host = "10.0.2.2:8080"
-                isSslEnabled = false
-                isPersistenceEnabled = false
-            }
-            auth.useEmulator("10.0.2.2", 9099);
-        }
+//        if (BuildConfig.DEBUG) {
+//            Log.i(TAG, "Setting Emulator Config")
+//            db.firestoreSettings = firestoreSettings {
+//                host = "10.0.2.2:8080"
+//                isSslEnabled = false
+//                isPersistenceEnabled = false
+//            }
+//            auth.useEmulator("10.0.2.2", 9099);
+//        }
     }
 
     fun messageCollectionReference(): CollectionReference {
