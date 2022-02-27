@@ -10,6 +10,3 @@ class Constants {
 val imageExtensions = listOf("jpg", "jpeg", "png", "gif")
 val URLRegex = Regex(Constants.URL_REGEX_PATTERN)
 
-enum class FireStoreCollection(val value: String) {
-    MessageCollection("messages")
-}

@@ -4,35 +4,46 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import com.fahimshahrierrasel.syncacross.data.getDummyItems
+import com.fahimshahrierrasel.syncacross.ui.OnLastItemReached
 import com.fahimshahrierrasel.syncacross.ui.components.*
+import com.fahimshahrierrasel.syncacross.ui.theme.AccentColor
+import com.fahimshahrierrasel.syncacross.viewmodels.HomeUIAction
+import com.fahimshahrierrasel.syncacross.viewmodels.HomeViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun Home(navController: NavController) {
-    val items = getDummyItems(20);
+fun Home(viewModel: HomeViewModel) {
     val selectableItems = listOf("All", "Bookmarks", "Medias", "Notes")
     val openSearch = remember { mutableStateOf(false) }
     val query = rememberSaveable { mutableStateOf("") }
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+    val viewState = viewModel.viewState.collectAsState()
+    val listState = rememberLazyListState()
+
+    LaunchedEffect("key") {
+        viewModel.onAction(HomeUIAction.GetSyncItems)
+    }
+
+    listState.OnLastItemReached {
+        viewModel.onAction(HomeUIAction.GetSyncItems)
+    }
 
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
-            if (openSearch.value)
+            if (openSearch.value) {
                 SearchBar(
                     query = query.value,
                     onSearchClosed = {
@@ -41,45 +52,64 @@ fun Home(navController: NavController) {
                     onQueryChanged = {
                         query.value = it
                     },
-                ) else
+                )
+            } else {
                 AppBar(
                     onSearchClicked = {
                         openSearch.value = true
                     },
                     onNavigationClicked = {
                         scope.launch {
-                            scaffoldState.drawerState.open();
+                            scaffoldState.drawerState.open()
                         }
                     },
+                    onRefreshClicked = {
+                        viewModel.onAction(HomeUIAction.RefreshSyncItems)
+                    }
                 )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { /*do something*/ }) {
-                Icon(Icons.Default.Add, contentDescription = "Localized description")
             }
         },
-        drawerContent = { AppDrawer(navController) }
+        floatingActionButton = {
+            if (!viewState.value.isLoading) {
+                FloatingActionButton(onClick = { /*do something*/ }) {
+                    Icon(Icons.Rounded.Add, contentDescription = "Localized description")
+                }
+            }
+        },
+        drawerContent = { AppDrawer() }
     ) {
-        Surface() {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    items(items = selectableItems) { item ->
-                        Tag(
-                            item,
-                            fontSize = 14.sp,
-                            textPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
-                            modifier = Modifier.padding(horizontal = 4.dp)
-                        )
+        Box {
+            Surface {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        items(items = selectableItems) { item ->
+                            Tag(
+                                item,
+                                fontSize = 14.sp,
+                                textPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                                modifier = Modifier.padding(horizontal = 4.dp)
+                            )
+                        }
+                    }
+                    LazyColumn(state = listState) {
+                        items(items = viewState.value.syncItems, key = { i -> i.id }) { syncItem ->
+                            SyncItemCard(syncItem)
+                        }
                     }
                 }
-                LazyColumn() {
-                    items(items = items) { _ ->
-                        SyncItemCard()
+            }
+            if (viewState.value.isLoading) {
+                Surface(modifier = Modifier.fillMaxSize(), color = Color.Black.copy(alpha = 0.4f)) {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator(color = AccentColor)
                     }
                 }
             }

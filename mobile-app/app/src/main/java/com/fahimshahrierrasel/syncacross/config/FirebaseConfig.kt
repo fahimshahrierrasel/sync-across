@@ -1,12 +1,11 @@
 package com.fahimshahrierrasel.syncacross.config
 
 import android.util.Log
-import com.fahimshahrierrasel.syncacross.data.models.FireStoreCollection
+import com.fahimshahrierrasel.syncacross.data.models.FirebaseResponse
 import com.fahimshahrierrasel.syncacross.data.models.SyncItem
+import com.fahimshahrierrasel.syncacross.utils.logInAndroid
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -14,11 +13,14 @@ import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.tasks.await
 
+enum class FireStoreCollection(val value: String) {
+    MessageCollection("messages")
+}
+
 object FirebaseConfig {
     private val TAG = Firebase::class.simpleName
-    private val db: FirebaseFirestore = Firebase.firestore
     private val storage: FirebaseStorage = Firebase.storage
-    val syncFilesRef = storage.reference.child("sync_files")
+    private val syncFilesRef = storage.reference.child("sync_files")
     val auth = FirebaseAuth.getInstance()
 
     init {
@@ -33,13 +35,30 @@ object FirebaseConfig {
 //        }
     }
 
-    fun messageCollectionReference(): CollectionReference {
-        return db.collection(FireStoreCollection.MessageCollection.value)
+    suspend fun getSyncItems(
+        limit: Long = 10,
+        lastItem: DocumentSnapshot? = null
+    ): FirebaseResponse {
+
+        var query = Firebase.firestore.collection(FireStoreCollection.MessageCollection.value)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+        if (lastItem != null) {
+            query = query.startAfter(lastItem)
+        }
+        val items = query.limit(limit).get().await()
+
+        val syncItems = items.documents.mapNotNull { doc ->
+            doc.toObject(SyncItem::class.java)?.apply {
+                id = doc.id
+            }
+        }
+        return FirebaseResponse(syncItems, items.documents[items.documents.size - 1])
+
     }
 
     suspend fun createMessage(syncItem: SyncItem) {
         try {
-            db.collection(FireStoreCollection.MessageCollection.value)
+            Firebase.firestore.collection(FireStoreCollection.MessageCollection.value)
                 .add(syncItem.toFirebaseObject())
                 .await()
             Log.i(TAG, "Message Created")
@@ -50,7 +69,7 @@ object FirebaseConfig {
 
     suspend fun deleteMessage(id: String): Boolean {
         return try {
-            db.collection(FireStoreCollection.MessageCollection.value)
+            Firebase.firestore.collection(FireStoreCollection.MessageCollection.value)
                 .document(id)
                 .delete()
                 .await()

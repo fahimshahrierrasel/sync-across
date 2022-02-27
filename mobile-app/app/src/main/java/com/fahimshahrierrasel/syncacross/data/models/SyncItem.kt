@@ -5,14 +5,15 @@ import kotlin.collections.HashMap
 import kotlin.reflect.full.memberProperties
 
 data class SyncItem(
-    var title: String,
-    var type: ItemType,
+    var id: String,
+    var title: String?,
+    var type: String,
     var value: String,
     var origin: String,
-    var tags: List<String>,
+    var tags: List<String>?,
     var createdAt: Date
 ) {
-    constructor() : this("Untitled", ItemType.MESSAGE, "", "", emptyList(), Date())
+    constructor() : this("", "Untitled", ItemType.BOOKMARK.value, "", "", emptyList(), Date())
 
     fun toFirebaseObject(): HashMap<String, Any> {
         val firebaseObject = HashMap<String, Any>()
