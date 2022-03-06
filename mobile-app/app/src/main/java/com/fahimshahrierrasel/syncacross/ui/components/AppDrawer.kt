@@ -4,13 +4,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,10 +24,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.fahimshahrierrasel.syncacross.R
 import com.fahimshahrierrasel.syncacross.config.FirebaseConfig
+import com.fahimshahrierrasel.syncacross.data.models.Tag
+import com.fahimshahrierrasel.syncacross.viewmodels.HomeUIAction
+import com.fahimshahrierrasel.syncacross.viewmodels.HomeViewModel
 import com.google.accompanist.flowlayout.FlowRow
 
 @Composable
-fun AppDrawer() {
+fun AppDrawer(viewModel: HomeViewModel) {
+    val isFormDialogOpened = remember { mutableStateOf(false) }
+    val viewState = viewModel.viewState.collectAsState()
 
     fun onLogoutClick() {
         FirebaseConfig.auth.signOut();
@@ -56,11 +62,21 @@ fun AppDrawer() {
             }
             Divider(Modifier.padding(vertical = 4.dp), thickness = 2.dp)
 
-            Text(
-                stringResource(R.string.tags),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium,
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    stringResource(R.string.tags),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                )
+                IconButton(onClick = { isFormDialogOpened.value = true }) {
+                    Icon(Icons.Rounded.Add, contentDescription = stringResource(R.string.add))
+                }
+            }
+
             FlowRow(
                 mainAxisSpacing = 4.dp, crossAxisSpacing = 4.dp, modifier = Modifier
                     .padding(vertical = 4.dp)
@@ -68,15 +84,23 @@ fun AppDrawer() {
                         rememberScrollState()
                     )
             ) {
-                repeat(10) {
-                    Tag("Tag $it")
-                }
+                viewState.value.tags.forEach { Tag(label = it.title) }
             }
         }
         Button(onClick = { onLogoutClick() }, modifier = Modifier.fillMaxWidth()) {
             Icon(Icons.Rounded.Logout, contentDescription = stringResource(R.string.logout))
             Spacer(modifier = Modifier.width(8.dp))
             Text(stringResource(R.string.logout), textAlign = TextAlign.Center)
+        }
+
+        if (isFormDialogOpened.value) {
+            TagFormDialog(
+                viewModel = viewModel,
+                onDismiss = { isFormDialogOpened.value = false },
+                onSave = {
+                    viewModel.onAction(HomeUIAction.NewTag(it))
+                    isFormDialogOpened.value = false
+                })
         }
     }
 }

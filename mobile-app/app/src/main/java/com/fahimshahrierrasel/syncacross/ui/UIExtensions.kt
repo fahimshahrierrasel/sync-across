@@ -23,3 +23,7 @@ fun LazyListState.OnLastItemReached(
             }
     }
 }
+
+fun String.localCapitalize(): String {
+    return this.replaceFirstChar(Char::titlecase)
+}

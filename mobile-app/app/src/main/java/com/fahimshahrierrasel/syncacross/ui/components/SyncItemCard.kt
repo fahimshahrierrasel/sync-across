@@ -26,7 +26,7 @@ import com.google.accompanist.flowlayout.FlowRow
 
 
 @Composable
-fun SyncItemCard(syncItem: SyncItem) {
+fun SyncItemCard(syncItem: SyncItem, onUpdateClicked: () -> Unit, onDeleteClicked: () -> Unit) {
     fun getIcon(): ImageVector {
         return when (syncItem.type) {
             ItemType.BOOKMARK.value -> {
@@ -35,7 +35,7 @@ fun SyncItemCard(syncItem: SyncItem) {
             ItemType.MEDIA.value -> {
                 Icons.Rounded.Movie
             }
-            ItemType.Note.value -> {
+            ItemType.NOTE.value -> {
                 Icons.Rounded.Note
             }
             else -> {
@@ -62,7 +62,7 @@ fun SyncItemCard(syncItem: SyncItem) {
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(verticalAlignment = Alignment.Top) {
                             Icon(
                                 getIcon(),
                                 contentDescription = stringResource(R.string.content_type),
@@ -80,14 +80,14 @@ fun SyncItemCard(syncItem: SyncItem) {
                             Icons.Rounded.Edit,
                             tint = PrimaryColor,
                             contentDescription = stringResource(R.string.edit),
-                            modifier = Modifier.clickable { }
+                            modifier = Modifier.clickable(onClick = onUpdateClicked)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Icon(
                             Icons.Rounded.DeleteOutline,
                             tint = ErrorColor,
                             contentDescription = stringResource(R.string.delete),
-                            modifier = Modifier.clickable { }
+                            modifier = Modifier.clickable(onClick = onDeleteClicked)
                         )
                     }
                 }

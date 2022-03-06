@@ -1,5 +1,6 @@
 package com.fahimshahrierrasel.syncacross.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -13,13 +14,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.fahimshahrierrasel.syncacross.data.models.SyncItem
 import com.fahimshahrierrasel.syncacross.ui.OnLastItemReached
 import com.fahimshahrierrasel.syncacross.ui.components.*
 import com.fahimshahrierrasel.syncacross.ui.theme.AccentColor
+import com.fahimshahrierrasel.syncacross.viewmodels.HomeShotEvent
 import com.fahimshahrierrasel.syncacross.viewmodels.HomeUIAction
 import com.fahimshahrierrasel.syncacross.viewmodels.HomeViewModel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @Composable
@@ -31,9 +37,22 @@ fun Home(viewModel: HomeViewModel) {
     val scope = rememberCoroutineScope()
     val viewState = viewModel.viewState.collectAsState()
     val listState = rememberLazyListState()
+    val isFormDialogOpened = remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val selectedItem: MutableState<SyncItem?> = remember { mutableStateOf(null) }
 
     LaunchedEffect("key") {
+        viewModel.shotEvents.onEach {
+            when (it) {
+                HomeShotEvent.Error -> {
+//                    scaffoldState.snackbarHostState.showSnackbar(viewState.value.message)
+                    Toast.makeText(context, viewState.value.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.collect()
+
         viewModel.onAction(HomeUIAction.GetSyncItems)
+        viewModel.onAction(HomeUIAction.GetTags)
     }
 
     listState.OnLastItemReached {
@@ -71,12 +90,15 @@ fun Home(viewModel: HomeViewModel) {
         },
         floatingActionButton = {
             if (!viewState.value.isLoading) {
-                FloatingActionButton(onClick = { /*do something*/ }) {
+                FloatingActionButton(onClick = {
+                    selectedItem.value = null
+                    isFormDialogOpened.value = true
+                }) {
                     Icon(Icons.Rounded.Add, contentDescription = "Localized description")
                 }
             }
         },
-        drawerContent = { AppDrawer() }
+        drawerContent = { AppDrawer(viewModel) }
     ) {
         Box {
             Surface {
@@ -98,7 +120,16 @@ fun Home(viewModel: HomeViewModel) {
                     }
                     LazyColumn(state = listState) {
                         items(items = viewState.value.syncItems, key = { i -> i.id }) { syncItem ->
-                            SyncItemCard(syncItem)
+                            SyncItemCard(
+                                syncItem,
+                                onUpdateClicked = {
+                                    selectedItem.value = syncItem
+                                    isFormDialogOpened.value = true
+                                },
+                                onDeleteClicked = {
+                                    viewModel.onAction(HomeUIAction.DeleteSyncItem(syncItem.id))
+                                },
+                            )
                         }
                     }
                 }
@@ -112,6 +143,21 @@ fun Home(viewModel: HomeViewModel) {
                         CircularProgressIndicator(color = AccentColor)
                     }
                 }
+            }
+            if (isFormDialogOpened.value) {
+                ItemFormDialog(
+                    viewModel = viewModel,
+                    syncItem = selectedItem.value,
+                    onDismiss = { isFormDialogOpened.value = false },
+                    onSave = { syncItem ->
+                        if (syncItem.id.isEmpty()) {
+                            viewModel.onAction(HomeUIAction.NewSyncItem(syncItem))
+                        } else {
+                            viewModel.onAction(HomeUIAction.UpdateSyncItem(syncItem))
+                        }
+                        isFormDialogOpened.value = false
+                    }
+                )
             }
         }
     }

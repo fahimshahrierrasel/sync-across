@@ -1,46 +1,44 @@
 package com.fahimshahrierrasel.syncacross.config
 
-import android.util.Log
+import com.fahimshahrierrasel.syncacross.BuildConfig
 import com.fahimshahrierrasel.syncacross.data.models.FirebaseResponse
 import com.fahimshahrierrasel.syncacross.data.models.SyncItem
+import com.fahimshahrierrasel.syncacross.data.models.Tag
 import com.fahimshahrierrasel.syncacross.utils.logInAndroid
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.firestoreSettings
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageException
-import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.tasks.await
 
 enum class FireStoreCollection(val value: String) {
-    MessageCollection("messages")
+    ItemCollection("messages"),
+    TagCollection("tags")
 }
 
 object FirebaseConfig {
-    private val TAG = Firebase::class.simpleName
-    private val storage: FirebaseStorage = Firebase.storage
-    private val syncFilesRef = storage.reference.child("sync_files")
     val auth = FirebaseAuth.getInstance()
 
     init {
-//        if (BuildConfig.DEBUG) {
-//            Log.i(TAG, "Setting Emulator Config")
-//            db.firestoreSettings = firestoreSettings {
-//                host = "10.0.2.2:8080"
-//                isSslEnabled = false
-//                isPersistenceEnabled = false
-//            }
-//            auth.useEmulator("10.0.2.2", 9099);
-//        }
+        if (BuildConfig.DEBUG) {
+            logInAndroid("Setting Emulator Config ${BuildConfig.BUILD_TYPE} ${BuildConfig.DEBUG} ${BuildConfig.APPLICATION_ID}")
+            Firebase.firestore.firestoreSettings = firestoreSettings {
+                host = "10.0.2.2:8080"
+                isSslEnabled = false
+                isPersistenceEnabled = false
+            }
+            auth.useEmulator("10.0.2.2", 9099);
+        }
     }
 
     suspend fun getSyncItems(
         limit: Long = 10,
         lastItem: DocumentSnapshot? = null
-    ): FirebaseResponse {
+    ): FirebaseResponse<SyncItem> {
 
-        var query = Firebase.firestore.collection(FireStoreCollection.MessageCollection.value)
+        var query = Firebase.firestore.collection(FireStoreCollection.ItemCollection.value)
             .orderBy("createdAt", Query.Direction.DESCENDING)
         if (lastItem != null) {
             query = query.startAfter(lastItem)
@@ -56,38 +54,59 @@ object FirebaseConfig {
 
     }
 
-    suspend fun createMessage(syncItem: SyncItem) {
-        try {
-            Firebase.firestore.collection(FireStoreCollection.MessageCollection.value)
-                .add(syncItem.toFirebaseObject())
-                .await()
-            Log.i(TAG, "Message Created")
-        } catch (ex: FirebaseFirestoreException) {
-            Log.e(TAG, ex.message, ex)
+    suspend fun getTags(): List<Tag> {
+        val query = Firebase.firestore.collection(FireStoreCollection.TagCollection.value)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+        val items = query.get().await()
+
+        val tags = items.documents.mapNotNull { doc ->
+            doc.toObject(Tag::class.java)?.apply {
+                id = doc.id
+            }
+        }
+        return tags
+    }
+
+    suspend fun createSyncItem(syncItem: SyncItem): SyncItem {
+        val ref = Firebase.firestore.collection(FireStoreCollection.ItemCollection.value)
+            .add(syncItem.toFirebaseObject())
+            .await()
+
+        return syncItem.apply {
+            id = ref.id
         }
     }
 
-    suspend fun deleteMessage(id: String): Boolean {
-        return try {
-            Firebase.firestore.collection(FireStoreCollection.MessageCollection.value)
-                .document(id)
-                .delete()
-                .await()
-            Log.i(TAG, "Message Deleted")
-            true
-        } catch (ex: FirebaseFirestoreException) {
-            Log.e(TAG, ex.message, ex)
-            false
+    suspend fun createTag(tag: Tag): Tag {
+        val ref = Firebase.firestore.collection(FireStoreCollection.TagCollection.value)
+            .add(tag.toFirebaseObject())
+            .await()
+        return tag.apply {
+            id = ref.id
         }
     }
 
-    suspend fun deleteFile(fileName: String): Boolean {
-        return try {
-            syncFilesRef.child(fileName).delete().await()
-            true
-        } catch (ex: StorageException) {
-            Log.e(TAG, ex.message, ex)
-            false
-        }
+    /**
+     * Delete sync item from firebase
+     *
+     * Note: it will create some kind of issue in the app
+     * when last item of the page removed and paginate next
+     *
+     * @param id the id of the sync item
+     */
+    suspend fun deleteSyncItem(id: String): Boolean {
+        Firebase.firestore.collection(FireStoreCollection.ItemCollection.value)
+            .document(id)
+            .delete()
+            .await()
+        return true
+    }
+
+    suspend fun updateSyncItem(id: String, syncItem: SyncItem): Boolean {
+        Firebase.firestore.collection(FireStoreCollection.ItemCollection.value)
+            .document(id)
+            .update(syncItem.toFirebaseObject())
+            .await()
+        return true
     }
 }
