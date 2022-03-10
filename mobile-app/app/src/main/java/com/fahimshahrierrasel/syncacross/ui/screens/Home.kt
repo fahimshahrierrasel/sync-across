@@ -119,7 +119,14 @@ fun Home(viewModel: HomeViewModel) {
                         }
                     }
                     LazyColumn(state = listState) {
-                        items(items = viewState.value.syncItems, key = { i -> i.id }) { syncItem ->
+                        items(items = viewState.value.syncItems.filter { st ->
+                            (st.title != null && st.title!!.lowercase()
+                                .contains(
+                                    query.value.lowercase(),
+                                    ignoreCase = true
+                                )) || st.value.lowercase()
+                                .contains(query.value.lowercase(), ignoreCase = true)
+                        }, key = { i -> i.id }) { syncItem ->
                             SyncItemCard(
                                 syncItem,
                                 onUpdateClicked = {
