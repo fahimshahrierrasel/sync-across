@@ -1,9 +1,14 @@
 # Sync Across
 <img src="./loop.svg" width="64">
 
-Sync :recycle: small note, clip or file between mobile and web.
+Sync :recycle: small note, multimedia and bookmark between devices.
 
-![Simple Diagram](./diagram.png)
+### Web
+![Sync Across Web](./web.png)
+
+### Mobile
+![Sync Across Web](./mobile.png)
+
 
 **Stack**
 - Mobile (Kotlin)
