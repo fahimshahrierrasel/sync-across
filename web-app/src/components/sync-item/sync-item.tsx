@@ -63,7 +63,7 @@ const SyncItem = ({ syncItem, onDeleteItem }: ISyncItemProps) => {
       case "multimedia": {
         return <Multimedia />;
       }
-      case "notes": {
+      case "note": {
         return <Notes />;
       }
       default: {
