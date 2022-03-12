@@ -15,6 +15,16 @@ data class SyncItem(
 ) {
     constructor() : this("", "Untitled", ItemType.BOOKMARK.value, "", "", emptyList(), Date())
 
+    constructor(title: String, value: String) : this(
+        "",
+        title,
+        ItemType.BOOKMARK.value,
+        value,
+        "",
+        emptyList(),
+        Date()
+    )
+
     fun toFirebaseObject(): HashMap<String, Any> {
         val firebaseObject = HashMap<String, Any>()
         this::class.memberProperties.filter { it.name != "id" }.forEach {

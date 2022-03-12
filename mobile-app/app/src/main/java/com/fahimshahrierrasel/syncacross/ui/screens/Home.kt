@@ -17,10 +17,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.fahimshahrierrasel.syncacross.data.models.PageLimit
 import com.fahimshahrierrasel.syncacross.data.models.SyncItem
 import com.fahimshahrierrasel.syncacross.ui.OnLastItemReached
 import com.fahimshahrierrasel.syncacross.ui.components.*
 import com.fahimshahrierrasel.syncacross.ui.theme.AccentColor
+import com.fahimshahrierrasel.syncacross.utils.logInAndroid
 import com.fahimshahrierrasel.syncacross.viewmodels.HomeShotEvent
 import com.fahimshahrierrasel.syncacross.viewmodels.HomeUIAction
 import com.fahimshahrierrasel.syncacross.viewmodels.HomeViewModel
@@ -30,7 +32,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun Home(viewModel: HomeViewModel) {
-    val selectableItems = listOf("All", "Bookmarks", "Medias", "Notes")
+    val selectableItems = listOf("All", "Bookmarks", "Multimedia", "Notes")
     val openSearch = remember { mutableStateOf(false) }
     val query = rememberSaveable { mutableStateOf("") }
     val scaffoldState = rememberScaffoldState()
@@ -40,23 +42,29 @@ fun Home(viewModel: HomeViewModel) {
     val isFormDialogOpened = remember { mutableStateOf(false) }
     val context = LocalContext.current
     val selectedItem: MutableState<SyncItem?> = remember { mutableStateOf(null) }
+    val selectedType: MutableState<String> = remember { mutableStateOf("") }
 
-    LaunchedEffect("key") {
+    LaunchedEffect(Unit) {
+        viewModel.onAction(HomeUIAction.GetTags)
+        viewModel.onAction(HomeUIAction.GetSyncItems)
         viewModel.shotEvents.onEach {
             when (it) {
                 HomeShotEvent.Error -> {
-//                    scaffoldState.snackbarHostState.showSnackbar(viewState.value.message)
                     Toast.makeText(context, viewState.value.message, Toast.LENGTH_SHORT).show()
+                }
+                is HomeShotEvent.NewItem -> {
+                    selectedItem.value = SyncItem(it.title, it.message)
+                    isFormDialogOpened.value = true
                 }
             }
         }.collect()
-
-        viewModel.onAction(HomeUIAction.GetSyncItems)
-        viewModel.onAction(HomeUIAction.GetTags)
     }
 
     listState.OnLastItemReached {
-        viewModel.onAction(HomeUIAction.GetSyncItems)
+        if(viewState.value.syncItems.size >= PageLimit){
+            logInAndroid("On Last Item Reached")
+            viewModel.onAction(HomeUIAction.GetSyncItems)
+        }
     }
 
     Scaffold(
@@ -113,8 +121,14 @@ fun Home(viewModel: HomeViewModel) {
                             Tag(
                                 item,
                                 fontSize = 14.sp,
+                                isSelected = item == selectedType.value,
                                 textPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
-                                modifier = Modifier.padding(horizontal = 4.dp)
+                                onClick = {
+                                    selectedType.value = item
+                                    viewModel.onAction(HomeUIAction.ShowMessage(selectedType.value))
+                                },
+                                modifier = Modifier
+                                    .padding(horizontal = 4.dp)
                             )
                         }
                     }

@@ -9,4 +9,5 @@ class Constants {
 
 val imageExtensions = listOf("jpg", "jpeg", "png", "gif")
 val URLRegex = Regex(Constants.URL_REGEX_PATTERN)
+val PageLimit = 10L
 

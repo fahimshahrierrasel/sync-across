@@ -23,6 +23,7 @@ data class HomeViewState(
 
 sealed class HomeShotEvent {
     object Error : HomeShotEvent()
+    class NewItem(val title:String, val message: String): HomeShotEvent()
 }
 
 sealed class HomeUIAction {
@@ -34,6 +35,7 @@ sealed class HomeUIAction {
     class UpdateSyncItem(val item: SyncItem) : HomeUIAction()
     class NewTag(val title: String) : HomeUIAction()
     class ShowMessage(val message: String) : HomeUIAction()
+    class IntentNewSyncItem(val title: String, val message: String) : HomeUIAction()
 }
 
 class HomeViewModel {
@@ -150,13 +152,18 @@ class HomeViewModel {
                         setLoadingState(true)
                         val isUpdated = FirebaseConfig.updateSyncItem(uiAction.item.id, uiAction.item)
                         if(isUpdated){
-                            updateSyncItem(uiAction.item);
+                            updateSyncItem(uiAction.item)
                         }
                     } catch (e: Exception) {
                         logInAndroid("Error: " + e.localizedMessage)
                     } finally {
                         setLoadingState(false)
                     }
+                }
+            }
+            is HomeUIAction.IntentNewSyncItem -> {
+                coroutineScope.launch {
+                    _shotEvents.send(HomeShotEvent.NewItem(uiAction.title, uiAction.message))
                 }
             }
         }

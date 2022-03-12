@@ -75,9 +75,9 @@ export default function AppSidebar() {
         direction="column"
         alignContent="center"
       >
-        <Anchor icon={<Flows />} label="All" />
+        <Anchor icon={<Flows />} label={`All (${state.syncItems.length})`} />
         <Anchor icon={<Bookmark />} label="Bookmarks" />
-        <Anchor icon={<Multimedia />} label="Multimedias" />
+        <Anchor icon={<Multimedia />} label="Multimedia" />
         <Anchor icon={<BlockQuote />} label="Notes" />
         <Box direction="row" justify="between" align="center">
           <Box direction="row" align="center">

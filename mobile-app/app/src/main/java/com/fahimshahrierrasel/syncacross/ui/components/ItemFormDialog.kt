@@ -28,7 +28,7 @@ fun ItemFormDialog(
     syncItem: SyncItem? = null,
 ) {
     val itemTypes: List<RadioGroupItem> =
-        ItemType.values().filter { it != ItemType.MEDIA }.map { RadioGroupItem(it.value, it.value) }
+        ItemType.values().filter { it != ItemType.MULTIMEDIA }.map { RadioGroupItem(it.value, it.value) }
     val selectedType = remember { mutableStateOf(syncItem?.type ?: ItemType.BOOKMARK.value) }
     val title = remember { mutableStateOf(syncItem?.title ?: "") }
     val itemValue = remember { mutableStateOf(syncItem?.value ?: "") }
@@ -91,7 +91,7 @@ fun ItemFormDialog(
                         Icon(Icons.Rounded.Close, contentDescription = "Close")
                     }
                     Text(
-                        "${if (syncItem != null) "Update" else "New"} Item",
+                        "${if (syncItem != null && syncItem.id.isNotEmpty()) "Update" else "New"} Item",
                         fontSize = 20.sp,
                         modifier = Modifier.weight(1f)
                     )

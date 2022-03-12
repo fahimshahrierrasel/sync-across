@@ -22,11 +22,12 @@ class Firebase {
     this.db = firebase.firestore();
     this.auth = firebase.auth();
     this.storage = firebase.storage();
-
-    // if (window.location.hostname === "localhost") {
-    //   this.db.useEmulator("localhost", 8080);
-    //   this.auth.useEmulator("http://localhost:9099/");
-    // }
+    
+    if (window.location.hostname === "localhost") {
+      this.db.useEmulator("localhost", 8080);
+      this.auth.useEmulator("http://localhost:9099/");
+      this.storage.useEmulator("localhost", 9199);
+    }
   }
 }
 

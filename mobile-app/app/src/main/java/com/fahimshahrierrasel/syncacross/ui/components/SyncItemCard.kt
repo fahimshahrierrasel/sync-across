@@ -32,7 +32,7 @@ fun SyncItemCard(syncItem: SyncItem, onUpdateClicked: () -> Unit, onDeleteClicke
             ItemType.BOOKMARK.value -> {
                 Icons.Rounded.BookmarkBorder
             }
-            ItemType.MEDIA.value -> {
+            ItemType.MULTIMEDIA.value -> {
                 Icons.Rounded.Movie
             }
             ItemType.NOTE.value -> {

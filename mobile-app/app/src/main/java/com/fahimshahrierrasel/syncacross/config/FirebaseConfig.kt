@@ -2,6 +2,7 @@ package com.fahimshahrierrasel.syncacross.config
 
 import com.fahimshahrierrasel.syncacross.BuildConfig
 import com.fahimshahrierrasel.syncacross.data.models.FirebaseResponse
+import com.fahimshahrierrasel.syncacross.data.models.PageLimit
 import com.fahimshahrierrasel.syncacross.data.models.SyncItem
 import com.fahimshahrierrasel.syncacross.data.models.Tag
 import com.fahimshahrierrasel.syncacross.utils.logInAndroid
@@ -34,7 +35,7 @@ object FirebaseConfig {
     }
 
     suspend fun getSyncItems(
-        limit: Long = 10,
+        limit: Long = PageLimit,
         lastItem: DocumentSnapshot? = null
     ): FirebaseResponse<SyncItem> {
 
