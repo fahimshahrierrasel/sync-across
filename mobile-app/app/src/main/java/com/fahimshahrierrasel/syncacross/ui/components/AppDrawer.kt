@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.fahimshahrierrasel.syncacross.BuildConfig
 import com.fahimshahrierrasel.syncacross.R
 import com.fahimshahrierrasel.syncacross.config.FirebaseConfig
 import com.fahimshahrierrasel.syncacross.data.models.Tag
@@ -57,7 +58,7 @@ fun AppDrawer(viewModel: HomeViewModel) {
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Text("v1.0.0.1", color = Color.Gray)
+                Text("v${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})", color = Color.Gray)
 
             }
             Divider(Modifier.padding(vertical = 4.dp), thickness = 2.dp)

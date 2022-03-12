@@ -13,15 +13,15 @@ android {
         applicationId "com.fahimshahrierrasel.syncacross"
         minSdkVersion 23
         targetSdkVersion 31
-        versionCode 3
-        versionName "1.0"
+        versionCode 4
+        versionName "1.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
